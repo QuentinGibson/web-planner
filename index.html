@@ -63,6 +63,18 @@
             stroke: gold;
         }
 
+        circle.preview {
+            fill: #4a90e2;
+            stroke: #6ab0f5;
+            fill-opacity: 0.6;
+        }
+
+        circle.preview-remove {
+            fill: #e24a4a;
+            stroke: #f56a6a;
+            fill-opacity: 0.6;
+        }
+
         #connections line,
         #connections path {
             stroke-opacity: 0.5;
@@ -73,6 +85,13 @@
             stroke: #d4af37;
             stroke-opacity: 0.9;
             stroke-width: 20;
+        }
+
+        #connections line.preview,
+        #connections path.preview {
+            stroke: #4a90e2;
+            stroke-opacity: 0.7;
+            stroke-width: 18;
         }
 
         /* Phase 1: Skill Points Overlay */
@@ -191,6 +210,7 @@
 
                 // Phase 1: Track allocated nodes
                 let allocatedNodes = new Set();
+                let startingNodeId = null; // Track the class starting node
                 const maxPoints = 123;
 
                 // Build connection graph once for performance
@@ -269,6 +289,45 @@
                     return null; // No path found
                 }
 
+                // Find all nodes that would be disconnected if a node is removed
+                function findDisconnectedNodes(removedNodeId) {
+                    const disconnected = [];
+
+                    // Check each allocated node (except starting node and the one being removed)
+                    allocatedNodes.forEach(nodeId => {
+                        if (nodeId === startingNodeId || nodeId === removedNodeId) return;
+
+                        // Try to find path from this node to starting node, without using removedNodeId
+                        const queue = [nodeId];
+                        const visited = new Set([nodeId, removedNodeId]); // Mark removed as visited so we don't use it
+                        let foundStart = false;
+
+                        while (queue.length > 0) {
+                            const currentId = queue.shift();
+
+                            if (currentId === startingNodeId) {
+                                foundStart = true;
+                                break;
+                            }
+
+                            const neighbors = connectionGraph.get(currentId) || [];
+                            neighbors.forEach(neighborId => {
+                                // Only traverse through allocated nodes
+                                if (!visited.has(neighborId) && allocatedNodes.has(neighborId)) {
+                                    visited.add(neighborId);
+                                    queue.push(neighborId);
+                                }
+                            });
+                        }
+
+                        if (!foundStart) {
+                            disconnected.push(nodeId);
+                        }
+                    });
+
+                    return disconnected;
+                }
+
                 // Add zoom and pan
                 let zoom = 1.0;  // Start at 1x zoom (normal size)
                 let panX = 0;
@@ -279,7 +338,8 @@
 
                 // Phase 1: Update points display
                 function updatePointsDisplay() {
-                    const pointsUsed = allocatedNodes.size;
+                    // Don't count the starting node
+                    const pointsUsed = startingNodeId ? allocatedNodes.size - 1 : 0;
                     document.getElementById('points-used').textContent = pointsUsed;
                 }
 
@@ -345,15 +405,117 @@
                     });
                 }
 
+                // Hover preview for path
+                function clearPreview() {
+                    // Clear all preview nodes
+                    const previewNodes = svg.querySelectorAll('circle.preview, circle.preview-remove');
+                    previewNodes.forEach(node => {
+                        node.classList.remove('preview');
+                        node.classList.remove('preview-remove');
+                    });
+
+                    // Clear all preview connections
+                    const previewConns = svg.querySelectorAll('#connections line.preview, #connections path.preview');
+                    previewConns.forEach(conn => conn.classList.remove('preview'));
+                }
+
+                function showPreview(nodeId) {
+                    clearPreview();
+
+                    if (allocatedNodes.has(nodeId)) {
+                        // Show preview of nodes that will be removed (red)
+                        const disconnected = findDisconnectedNodes(nodeId);
+
+                        // Preview the node being removed
+                        const targetNode = svg.querySelector(`#n${nodeId}`);
+                        if (targetNode && nodeId !== startingNodeId) {
+                            targetNode.classList.add('preview-remove');
+                        }
+
+                        // Preview all nodes that will be disconnected
+                        disconnected.forEach(discNodeId => {
+                            const discNode = svg.querySelector(`#n${discNodeId}`);
+                            if (discNode) {
+                                discNode.classList.add('preview-remove');
+                            }
+                        });
+                    } else {
+                        // Show preview of nodes that will be added (blue)
+                        const path = findShortestPath(nodeId);
+
+                        if (path !== null) {
+                            // Preview the target node
+                            const targetNode = svg.querySelector(`#n${nodeId}`);
+                            if (targetNode) {
+                                targetNode.classList.add('preview');
+                            }
+
+                            // Preview all intermediate nodes
+                            path.forEach(pathNodeId => {
+                                const pathNode = svg.querySelector(`#n${pathNodeId}`);
+                                if (pathNode && !allocatedNodes.has(pathNodeId)) {
+                                    pathNode.classList.add('preview');
+                                }
+                            });
+
+                            // Preview connections between preview nodes
+                            const previewNodeIds = new Set([nodeId, ...path]);
+                            const allConnections = svg.querySelectorAll('#connections line, #connections path');
+                            allConnections.forEach(conn => {
+                                const connId = conn.id;
+                                if (connId.startsWith('c')) {
+                                    const parts = connId.substring(1).split('-');
+                                    if (parts.length === 2) {
+                                        const [id1, id2] = parts;
+                                        // Show preview if both nodes are in preview set or one is allocated and one is preview
+                                        if ((previewNodeIds.has(id1) || allocatedNodes.has(id1)) &&
+                                            (previewNodeIds.has(id2) || allocatedNodes.has(id2))) {
+                                            conn.classList.add('preview');
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }
+
+                svg.addEventListener('mouseover', (e) => {
+                    if (e.target.tagName === 'circle') {
+                        const nodeId = e.target.id.replace('n', '');
+                        showPreview(nodeId);
+                    }
+                });
+
+                svg.addEventListener('mouseout', (e) => {
+                    if (e.target.tagName === 'circle') {
+                        clearPreview();
+                    }
+                });
+
                 // Add click to allocate with path validation
                 svg.addEventListener('click', (e) => {
                     if (e.target.tagName === 'circle') {
                         const nodeId = e.target.id.replace('n', '');
 
                         if (e.target.classList.contains('allocated')) {
-                            // Deallocate
+                            // Can't remove the starting node
+                            if (nodeId === startingNodeId) return;
+
+                            // Find nodes that will be disconnected
+                            const disconnected = findDisconnectedNodes(nodeId);
+
+                            // Deallocate the clicked node
                             e.target.classList.remove('allocated');
                             allocatedNodes.delete(nodeId);
+
+                            // Deallocate all disconnected nodes
+                            disconnected.forEach(discNodeId => {
+                                const discNode = svg.querySelector(`#n${discNodeId}`);
+                                if (discNode) {
+                                    discNode.classList.remove('allocated');
+                                    allocatedNodes.delete(discNodeId);
+                                }
+                            });
                         } else {
                             // Try to allocate with path finding
                             const path = findShortestPath(nodeId);
@@ -408,6 +570,7 @@
                     if (startingNode) {
                         startingNode.classList.add('allocated');
                         allocatedNodes.add(nodeId);
+                        startingNodeId = nodeId; // Track the starting node
                         updatePointsDisplay();
                     }
                 });
