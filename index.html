@@ -74,10 +74,56 @@
             stroke-opacity: 0.9;
             stroke-width: 20;
         }
+
+        /* Phase 1: Skill Points Overlay */
+        #points-overlay {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(26, 26, 26, 0.95);
+            border: 2px solid #3a3a3a;
+            border-radius: 8px;
+            padding: 20px;
+            color: #ccc;
+            min-width: 200px;
+            z-index: 1000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #points-overlay h3 {
+            margin: 0 0 15px 0;
+            color: #d4af37;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .points-display {
+            font-size: 28px;
+            color: #d4af37;
+            text-align: center;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        #points-used {
+            color: #d4af37;
+        }
+
+        #points-max {
+            color: #8cf;
+        }
     </style>
 </head>
 <body>
     <div id="tree-container"></div>
+
+    <!-- Phase 1: Points Counter Overlay -->
+    <div id="points-overlay">
+        <h3>Skill Points</h3>
+        <div class="points-display">
+            <span id="points-used">0</span> / <span id="points-max">123</span>
+        </div>
+    </div>
 
     <script>
         // Load the actual SVG snippet
@@ -88,6 +134,99 @@
 
                 const svg = document.getElementById('passive_skill_tree');
 
+                // Phase 1: Track allocated nodes
+                let allocatedNodes = new Set();
+                const maxPoints = 123;
+
+                // Build connection graph once for performance
+                const connectionGraph = new Map();
+                const allConnections = svg.querySelectorAll('#connections line, #connections path');
+                allConnections.forEach(conn => {
+                    const connId = conn.id;
+                    if (connId.startsWith('c')) {
+                        const parts = connId.substring(1).split('-');
+                        if (parts.length === 2) {
+                            const [id1, id2] = parts;
+                            // Add bidirectional connections
+                            if (!connectionGraph.has(id1)) connectionGraph.set(id1, []);
+                            if (!connectionGraph.has(id2)) connectionGraph.set(id2, []);
+                            connectionGraph.get(id1).push(id2);
+                            connectionGraph.get(id2).push(id1);
+                        }
+                    }
+                });
+                console.log('Built connection graph with', connectionGraph.size, 'nodes');
+
+                // Path validation: Find shortest path to any allocated node
+                function findShortestPath(targetNodeId) {
+                    console.log('Finding path for target:', targetNodeId, 'Allocated nodes:', Array.from(allocatedNodes));
+
+                    // If no nodes allocated, can't path (unless it's a start node)
+                    if (allocatedNodes.size === 0) {
+                        // Check if it's a class start node (they can be allocated freely)
+                        const targetCircle = svg.querySelector(`#n${targetNodeId}`);
+                        const nodeData = targetCircle?.getAttribute('data-bs-title');
+                        // Class starts typically have specific names
+                        if (nodeData && (nodeData.includes('RANGER') || nodeData.includes('MARAUDER') ||
+                            nodeData.includes('WITCH') || nodeData.includes('DUELIST') ||
+                            nodeData.includes('TEMPLAR') || nodeData.includes('SIX') ||
+                            nodeData.includes('Seven'))) {
+                            return [];
+                        }
+                        return null; // Can't allocate if nothing allocated and not a start
+                    }
+
+                    // BFS to find shortest path
+                    const queue = [];
+                    const visited = new Set();
+                    const parent = new Map();
+
+                    // Start from target and search for any allocated node
+                    console.log('Starting BFS from target:', targetNodeId, 'Type:', typeof targetNodeId);
+                    queue.push(targetNodeId);
+                    visited.add(targetNodeId);
+                    console.log('Queue after push:', queue);
+
+                    while (queue.length > 0) {
+                        const currentId = queue.shift();
+                        console.log('BFS visiting:', currentId, 'Type:', typeof currentId, 'Target was:', targetNodeId, 'Match?', currentId === targetNodeId, 'Is allocated?', allocatedNodes.has(currentId));
+
+                        // If we found an allocated node, reconstruct path
+                        if (allocatedNodes.has(currentId)) {
+                            console.log('Found allocated node:', currentId, 'Reconstructing path from it back to target...');
+                            const path = [];
+                            let node = currentId;
+                            // Reconstruct path from allocated node back to target
+                            // We walk backwards from the allocated node to the target
+                            while (parent.has(node)) {
+                                const childNode = node;
+                                node = parent.get(node);
+                                console.log('Path step:', childNode, '<-', node, 'Is target?', node === targetNodeId);
+                                // Add all nodes EXCEPT the already-allocated starting point
+                                if (!allocatedNodes.has(node)) {
+                                    path.push(node);
+                                }
+                            }
+                            console.log('Final path (intermediate nodes):', path);
+                            return path; // Return intermediate nodes only
+                        }
+
+                        // Find all connected nodes using pre-built graph
+                        const neighbors = connectionGraph.get(currentId) || [];
+                        console.log('Found', neighbors.length, 'connections for node', currentId);
+                        neighbors.forEach(neighborId => {
+                            if (!visited.has(neighborId)) {
+                                visited.add(neighborId);
+                                parent.set(neighborId, currentId);
+                                queue.push(neighborId);
+                            }
+                        });
+                    }
+
+                    console.log('No path found to any allocated node');
+                    return null; // No path found
+                }
+
                 // Add zoom and pan
                 let zoom = 1.0;  // Start at 1x zoom (normal size)
                 let panX = 0;
@@ -95,6 +234,12 @@
                 let isDragging = false;
                 let lastX = 0;
                 let lastY = 0;
+
+                // Phase 1: Update points display
+                function updatePointsDisplay() {
+                    const pointsUsed = allocatedNodes.size;
+                    document.getElementById('points-used').textContent = pointsUsed;
+                }
 
                 function updateViewBox() {
                     // Start centered on the main tree area (from official site)
@@ -140,33 +285,76 @@
                     updateViewBox();
                 });
 
-                // Add click to allocate
+                // Update all connection visuals
+                function updateAllConnections() {
+                    const allConnections = svg.querySelectorAll('#connections line, #connections path');
+                    allConnections.forEach(conn => {
+                        const connId = conn.id;
+                        const parts = connId.replace('c', '').split('-');
+                        if (parts.length === 2) {
+                            const n1 = svg.querySelector(`#n${parts[0]}`);
+                            const n2 = svg.querySelector(`#n${parts[1]}`);
+                            if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
+                                conn.classList.add('active');
+                            } else {
+                                conn.classList.remove('active');
+                            }
+                        }
+                    });
+                }
+
+                // Add click to allocate with path validation
                 svg.addEventListener('click', (e) => {
                     if (e.target.tagName === 'circle') {
-                        e.target.classList.toggle('allocated');
-
-                        // Update connected lines
                         const nodeId = e.target.id.replace('n', '');
-                        // Find connections
-                        const connections = svg.querySelectorAll(`[id*="${nodeId}"]`);
-                        connections.forEach(conn => {
-                            if (conn.tagName === 'line' || conn.tagName === 'path') {
-                                // Check if both nodes are allocated
-                                const connId = conn.id;
-                                const parts = connId.replace('c', '').split('-');
-                                if (parts.length === 2) {
-                                    const n1 = svg.querySelector(`#n${parts[0]}`);
-                                    const n2 = svg.querySelector(`#n${parts[1]}`);
-                                    if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
-                                        conn.classList.add('active');
-                                    } else {
-                                        conn.classList.remove('active');
+
+                        if (e.target.classList.contains('allocated')) {
+                            // Deallocate
+                            e.target.classList.remove('allocated');
+                            allocatedNodes.delete(nodeId);
+                        } else {
+                            // Try to allocate with path finding
+                            const path = findShortestPath(nodeId);
+                            console.log('Path for node', nodeId, ':', path);
+
+                            if (path !== null) {
+                                // Allocate the target node
+                                e.target.classList.add('allocated');
+                                allocatedNodes.add(nodeId);
+
+                                // Allocate all nodes in the path
+                                console.log('Allocating path nodes:', path);
+                                path.forEach(pathNodeId => {
+                                    const pathNode = svg.querySelector(`#n${pathNodeId}`);
+                                    console.log('Looking for node #n' + pathNodeId, pathNode);
+                                    if (pathNode && !allocatedNodes.has(pathNodeId)) {
+                                        pathNode.classList.add('allocated');
+                                        allocatedNodes.add(pathNodeId);
+                                        console.log('Allocated node', pathNodeId);
                                     }
-                                }
+                                });
+                            } else {
+                                // Can't allocate - no path found
+                                console.log('No path to allocated nodes');
+                                // Optional: Add visual feedback here (flash red, etc.)
                             }
-                        });
+                        }
+
+                        // Update points display
+                        updatePointsDisplay();
+
+                        // Update all connections
+                        updateAllConnections();
                     }
                 });
+
+                // Auto-allocate starting node (Templar)
+                const startingNode = svg.querySelector('#n61525');
+                if (startingNode) {
+                    startingNode.classList.add('allocated');
+                    allocatedNodes.add('61525');
+                    updatePointsDisplay();
+                }
 
                 updateViewBox();
             })
