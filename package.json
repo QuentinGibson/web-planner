@@ -1,0 +1,23 @@
+{
+  "name": "poe2-passive-tree-planner",
+  "version": "0.1.0",
+  "description": "Web-based passive tree planner for Path of Exile 2 - Proof of Concept",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "convert": "node convert-tree-data.js",
+    "dev": "node server.js"
+  },
+  "keywords": [
+    "path-of-exile",
+    "poe2",
+    "passive-tree",
+    "skill-tree",
+    "planner"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=12.0.0"
+  }
+}

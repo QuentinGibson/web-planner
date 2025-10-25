@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoE2 Passive Tree - Direct Copy</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #222;
+            overflow: hidden;
+        }
+
+        #tree-container {
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Exact CSS from poe2db */
+        svg#passive_skill_tree {
+            background: #222;
+            cursor: grab;
+            width: 100%;
+            height: 100%;
+        }
+
+        svg#passive_skill_tree:active {
+            cursor: grabbing;
+        }
+
+        circle {
+            stroke-width: 10;
+            stroke-opacity: 1;
+            fill: #000;
+            cursor: pointer;
+            transition: stroke-width 0.1s;
+        }
+
+        circle.normal {
+            stroke: #696969;
+        }
+
+        circle.notable {
+            stroke: orange;
+        }
+
+        circle.keystone {
+            stroke: yellow;
+        }
+
+        circle:hover {
+            stroke: #4a90e2;
+            stroke-width: 12;
+        }
+
+        circle.allocated {
+            fill: #d4af37;
+            stroke: gold;
+        }
+
+        #connections line,
+        #connections path {
+            stroke-opacity: 0.5;
+        }
+
+        #connections line.active,
+        #connections path.active {
+            stroke: #d4af37;
+            stroke-opacity: 0.9;
+            stroke-width: 20;
+        }
+    </style>
+</head>
+<body>
+    <div id="tree-container"></div>
+
+    <script>
+        // Load the actual SVG snippet
+        fetch('poe2snippet.html')
+            .then(response => response.text())
+            .then(svgContent => {
+                document.getElementById('tree-container').innerHTML = svgContent;
+
+                const svg = document.getElementById('passive_skill_tree');
+
+                // Add zoom and pan
+                let zoom = 1.0;  // Start at 1x zoom (normal size)
+                let panX = 0;
+                let panY = 0;
+                let isDragging = false;
+                let lastX = 0;
+                let lastY = 0;
+
+                function updateViewBox() {
+                    // Start centered on the main tree area (from official site)
+                    const baseViewBox = { x: -11326.103852910494, y: -11389.628444746082, width: 23256.18556701031, height: 20315.9793814433 };
+                    const width = baseViewBox.width / zoom;
+                    const height = baseViewBox.height / zoom;
+                    const x = baseViewBox.x - panX / zoom;
+                    const y = baseViewBox.y - panY / zoom;
+                    svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
+                }
+
+                svg.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    lastX = e.clientX;
+                    lastY = e.clientY;
+                });
+
+                svg.addEventListener('mousemove', (e) => {
+                    if (isDragging) {
+                        const dx = e.clientX - lastX;
+                        const dy = e.clientY - lastY;
+                        // Multiply by a factor to make panning faster and more responsive
+                        panX += dx * 50;
+                        panY += dy * 50;
+                        lastX = e.clientX;
+                        lastY = e.clientY;
+                        updateViewBox();
+                    }
+                });
+
+                svg.addEventListener('mouseup', () => {
+                    isDragging = false;
+                });
+
+                svg.addEventListener('mouseleave', () => {
+                    isDragging = false;
+                });
+
+                svg.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? -0.1 : 0.1;  // Faster zoom
+                    zoom = Math.max(0.1, Math.min(5.0, zoom + delta));
+                    updateViewBox();
+                });
+
+                // Add click to allocate
+                svg.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'circle') {
+                        e.target.classList.toggle('allocated');
+
+                        // Update connected lines
+                        const nodeId = e.target.id.replace('n', '');
+                        // Find connections
+                        const connections = svg.querySelectorAll(`[id*="${nodeId}"]`);
+                        connections.forEach(conn => {
+                            if (conn.tagName === 'line' || conn.tagName === 'path') {
+                                // Check if both nodes are allocated
+                                const connId = conn.id;
+                                const parts = connId.replace('c', '').split('-');
+                                if (parts.length === 2) {
+                                    const n1 = svg.querySelector(`#n${parts[0]}`);
+                                    const n2 = svg.querySelector(`#n${parts[1]}`);
+                                    if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
+                                        conn.classList.add('active');
+                                    } else {
+                                        conn.classList.remove('active');
+                                    }
+                                }
+                            }
+                        });
+                    }
+                });
+
+                updateViewBox();
+            })
+            .catch(err => {
+                console.error('Failed to load SVG:', err);
+                document.getElementById('tree-container').innerHTML = '<div style="color: white; padding: 20px;">Failed to load tree. Make sure poe2snippet.html exists.</div>';
+            });
+    </script>
+</body>
+</html>
