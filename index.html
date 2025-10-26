@@ -75,6 +75,20 @@
             fill-opacity: 0.6;
         }
 
+        .node-icon {
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        circle.allocated + .node-icon {
+            opacity: 1;
+        }
+
+        circle.preview + .node-icon,
+        circle.preview-remove + .node-icon {
+            opacity: 0.7;
+        }
+
         #connections line,
         #connections path {
             stroke-opacity: 0.5;
@@ -200,10 +214,12 @@
     </div>
 
     <script>
-        // Load the actual SVG snippet
-        fetch('poe2snippet.html')
-            .then(response => response.text())
-            .then(svgContent => {
+        // Load both the SVG and the tree data
+        Promise.all([
+            fetch('poe2snippet.html').then(r => r.text()),
+            fetch('data_us.json').then(r => r.json())
+        ])
+            .then(([svgContent, treeData]) => {
                 document.getElementById('tree-container').innerHTML = svgContent;
 
                 const svg = document.getElementById('passive_skill_tree');
@@ -212,6 +228,37 @@
                 let allocatedNodes = new Set();
                 let startingNodeId = null; // Track the class starting node
                 const maxPoints = 123;
+
+                // Apply node images from tree data
+                const nodes = treeData.nodes;
+                Object.keys(nodes).forEach(nodeId => {
+                    const nodeData = nodes[nodeId];
+                    const circle = svg.querySelector(`#n${nodeId}`);
+
+                    if (circle && nodeData.icon) {
+                        // Create image element
+                        const img = document.createElementNS('http://www.w3.org/2000/svg', 'image');
+                        const cx = parseFloat(circle.getAttribute('cx'));
+                        const cy = parseFloat(circle.getAttribute('cy'));
+                        const r = parseFloat(circle.getAttribute('r'));
+
+                        // Position image centered on the circle
+                        const imgSize = r * 1.5;
+                        img.setAttribute('x', cx - imgSize / 2);
+                        img.setAttribute('y', cy - imgSize / 2);
+                        img.setAttribute('width', imgSize);
+                        img.setAttribute('height', imgSize);
+
+                        // Convert CDN URL to local PNG path with lowercase filename
+                        const filename = nodeData.icon.split('/').pop().replace('.webp', '').toLowerCase();
+                        img.setAttribute('href', `images/passives/${filename}.png`);
+                        img.setAttribute('pointer-events', 'none'); // Don't block circle clicks
+                        img.classList.add('node-icon');
+
+                        // Insert image after the circle
+                        circle.parentNode.insertBefore(img, circle.nextSibling);
+                    }
+                });
 
                 // Build connection graph once for performance
                 const connectionGraph = new Map();
