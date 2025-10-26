@@ -188,6 +188,104 @@
             color: #d4af37;
         }
 
+        /* Build Management */
+        .build-management {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #3a3a3a;
+        }
+
+        .build-management h4 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .build-set-selection,
+        .breakpoint-selection {
+            margin-bottom: 15px;
+        }
+
+        .build-set-selection label,
+        .breakpoint-selection label {
+            display: block;
+            color: #ccc;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .build-set-selection select,
+        .breakpoint-selection select {
+            width: calc(100% - 110px);
+            padding: 8px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            color: #d4af37;
+            font-size: 13px;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        .build-set-selection button,
+        .breakpoint-selection button {
+            width: 30px;
+            height: 30px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            color: #d4af37;
+            font-size: 18px;
+            cursor: pointer;
+            vertical-align: middle;
+            margin-right: 2px;
+        }
+
+        .build-set-selection button:hover,
+        .breakpoint-selection button:hover {
+            background: #3a3a3a;
+            border-color: #d4af37;
+        }
+
+        #delete-set-btn,
+        #delete-breakpoint-btn-quick {
+            color: #ff6b6b;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        #delete-set-btn:hover,
+        #delete-breakpoint-btn-quick:hover {
+            border-color: #ff6b6b;
+        }
+
+        .build-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .build-actions button {
+            flex: 1;
+            padding: 8px;
+            background: #2a2a2a;
+            border: 1px solid #3a3a3a;
+            border-radius: 4px;
+            color: #d4af37;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .build-actions button:hover {
+            background: #3a3a3a;
+            border-color: #d4af37;
+        }
+
+        .build-actions button:active {
+            background: #1a1a1a;
+        }
+
         /* Node Tooltip */
         #node-tooltip {
             position: fixed;
@@ -260,6 +358,40 @@
                 <option value="47175">Warrior</option>
                 <option value="44683">Monk</option>
             </select>
+        </div>
+
+        <!-- Build Management -->
+        <div class="build-management">
+            <h4>Build Management</h4>
+
+            <!-- Build Set Selection -->
+            <div class="build-set-selection">
+                <label for="build-set-dropdown">Build Set</label>
+                <select id="build-set-dropdown">
+                    <option value="">-- New Build Set --</option>
+                </select>
+                <button id="new-set-btn" title="Create New Build Set">+</button>
+                <button id="edit-set-btn" title="Edit Build Set Name">✎</button>
+                <button id="delete-set-btn" title="Delete Build Set">×</button>
+            </div>
+
+            <!-- Level Breakpoint Selection -->
+            <div class="breakpoint-selection">
+                <label for="breakpoint-dropdown">Level Breakpoint</label>
+                <select id="breakpoint-dropdown">
+                    <option value="">-- Select Breakpoint --</option>
+                </select>
+                <button id="add-breakpoint-btn" title="Add Level Breakpoint">+</button>
+                <button id="edit-breakpoint-btn" title="Edit Breakpoint Name">✎</button>
+                <button id="delete-breakpoint-btn-quick" title="Delete Breakpoint">×</button>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="build-actions">
+                <button id="save-breakpoint-btn">Save Current</button>
+                <button id="load-breakpoint-btn">Load</button>
+                <button id="delete-breakpoint-btn">Delete</button>
+            </div>
         </div>
     </div>
 
@@ -489,7 +621,7 @@
 
                     const oldZoom = zoom;
                     const delta = e.deltaY > 0 ? -0.1 : 0.1;  // Faster zoom
-                    zoom = Math.max(0.5, Math.min(5.0, zoom + delta));  // Max zoom out: 0.5, Max zoom in: 5.0
+                    zoom = Math.max(0.5, Math.min(10.0, zoom + delta));  // Max zoom out: 0.5, Max zoom in: 10.0
 
                     // Keep pan stable relative to zoom change
                     // Don't adjust pan at all - let it stay constant
@@ -728,6 +860,252 @@
                         updatePointsDisplay();
                     }
                 });
+
+                // Build Management System
+                let buildSets = JSON.parse(localStorage.getItem('poe2_build_sets') || '{}');
+                let currentSetId = null;
+                let currentBreakpointId = null;
+
+                const buildSetDropdown = document.getElementById('build-set-dropdown');
+                const breakpointDropdown = document.getElementById('breakpoint-dropdown');
+                const newSetBtn = document.getElementById('new-set-btn');
+                const editSetBtn = document.getElementById('edit-set-btn');
+                const deleteSetBtn = document.getElementById('delete-set-btn');
+                const addBreakpointBtn = document.getElementById('add-breakpoint-btn');
+                const editBreakpointBtn = document.getElementById('edit-breakpoint-btn');
+                const deleteBreakpointBtnQuick = document.getElementById('delete-breakpoint-btn-quick');
+                const saveBreakpointBtn = document.getElementById('save-breakpoint-btn');
+                const loadBreakpointBtn = document.getElementById('load-breakpoint-btn');
+                const deleteBreakpointBtn = document.getElementById('delete-breakpoint-btn');
+
+                // Load build sets into dropdown
+                function refreshBuildSetDropdown() {
+                    buildSetDropdown.innerHTML = '<option value="">-- New Build Set --</option>';
+                    Object.keys(buildSets).forEach(setId => {
+                        const option = document.createElement('option');
+                        option.value = setId;
+                        option.textContent = buildSets[setId].name;
+                        buildSetDropdown.appendChild(option);
+                    });
+                }
+
+                // Load breakpoints for current set
+                function refreshBreakpointDropdown() {
+                    breakpointDropdown.innerHTML = '<option value="">-- Select Breakpoint --</option>';
+                    if (currentSetId && buildSets[currentSetId]) {
+                        const breakpoints = buildSets[currentSetId].breakpoints || {};
+                        Object.keys(breakpoints).forEach(bpId => {
+                            const bp = breakpoints[bpId];
+                            const option = document.createElement('option');
+                            option.value = bpId;
+                            option.textContent = `${bp.name} (${bp.points} points)`;
+                            breakpointDropdown.appendChild(option);
+                        });
+                    }
+                }
+
+                // Save to localStorage
+                function saveBuildSets() {
+                    localStorage.setItem('poe2_build_sets', JSON.stringify(buildSets));
+                }
+
+                // Create new build set
+                newSetBtn.addEventListener('click', () => {
+                    const name = prompt('Enter build set name:');
+                    if (name) {
+                        const setId = 'set_' + Date.now();
+                        buildSets[setId] = {
+                            name: name,
+                            breakpoints: {}
+                        };
+                        currentSetId = setId;
+                        saveBuildSets();
+                        refreshBuildSetDropdown();
+                        buildSetDropdown.value = setId;
+                        refreshBreakpointDropdown();
+                    }
+                });
+
+                // Edit build set name
+                editSetBtn.addEventListener('click', () => {
+                    if (!currentSetId) {
+                        alert('Please select a build set first.');
+                        return;
+                    }
+                    const currentName = buildSets[currentSetId].name;
+                    const newName = prompt('Enter new name for build set:', currentName);
+                    if (newName && newName !== currentName) {
+                        buildSets[currentSetId].name = newName;
+                        saveBuildSets();
+                        refreshBuildSetDropdown();
+                        buildSetDropdown.value = currentSetId;
+                    }
+                });
+
+                // Delete build set
+                deleteSetBtn.addEventListener('click', () => {
+                    if (!currentSetId) {
+                        alert('Please select a build set to delete.');
+                        return;
+                    }
+                    const setName = buildSets[currentSetId].name;
+                    if (confirm(`Are you sure you want to delete the build set "${setName}" and all its breakpoints?`)) {
+                        delete buildSets[currentSetId];
+                        currentSetId = null;
+                        currentBreakpointId = null;
+                        saveBuildSets();
+                        refreshBuildSetDropdown();
+                        refreshBreakpointDropdown();
+                        buildSetDropdown.value = '';
+                        breakpointDropdown.value = '';
+                    }
+                });
+
+                // Switch build set
+                buildSetDropdown.addEventListener('change', (e) => {
+                    currentSetId = e.target.value || null;
+                    currentBreakpointId = null;
+                    breakpointDropdown.value = '';
+                    refreshBreakpointDropdown();
+                });
+
+                // Add new breakpoint
+                addBreakpointBtn.addEventListener('click', () => {
+                    if (!currentSetId) {
+                        alert('Please select or create a build set first.');
+                        return;
+                    }
+                    const name = prompt('Enter name for this breakpoint (e.g., "Level 15 - Basic Setup", "Endgame"):');
+                    if (name) {
+                        const bpId = 'bp_' + Date.now();
+                        const pointsUsed = startingNodeId ? allocatedNodes.size - 1 : 0;
+                        buildSets[currentSetId].breakpoints[bpId] = {
+                            name: name,
+                            points: pointsUsed,
+                            allocatedNodes: Array.from(allocatedNodes),
+                            startingNode: startingNodeId,
+                            selectedClass: classDropdown.value
+                        };
+                        currentBreakpointId = bpId;
+                        saveBuildSets();
+                        refreshBreakpointDropdown();
+                        breakpointDropdown.value = bpId;
+                    }
+                });
+
+                // Edit breakpoint name
+                editBreakpointBtn.addEventListener('click', () => {
+                    const selectedBp = breakpointDropdown.value;
+                    if (!selectedBp) {
+                        alert('Please select a breakpoint first.');
+                        return;
+                    }
+                    const currentName = buildSets[currentSetId].breakpoints[selectedBp].name;
+                    const newName = prompt('Enter new name for breakpoint:', currentName);
+                    if (newName && newName !== currentName) {
+                        buildSets[currentSetId].breakpoints[selectedBp].name = newName;
+                        saveBuildSets();
+                        refreshBreakpointDropdown();
+                        breakpointDropdown.value = selectedBp;
+                    }
+                });
+
+                // Delete breakpoint (quick button)
+                deleteBreakpointBtnQuick.addEventListener('click', () => {
+                    const selectedBp = breakpointDropdown.value;
+                    if (!selectedBp) {
+                        alert('Please select a breakpoint to delete.');
+                        return;
+                    }
+                    const bpName = buildSets[currentSetId].breakpoints[selectedBp].name;
+                    if (confirm(`Are you sure you want to delete the breakpoint "${bpName}"?`)) {
+                        delete buildSets[currentSetId].breakpoints[selectedBp];
+                        currentBreakpointId = null;
+                        saveBuildSets();
+                        refreshBreakpointDropdown();
+                        breakpointDropdown.value = '';
+                    }
+                });
+
+                // Save current tree to breakpoint
+                saveBreakpointBtn.addEventListener('click', () => {
+                    if (!currentBreakpointId) {
+                        alert('Please select a breakpoint first.');
+                        return;
+                    }
+                    const pointsUsed = startingNodeId ? allocatedNodes.size - 1 : 0;
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].allocatedNodes = Array.from(allocatedNodes);
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].points = pointsUsed;
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].startingNode = startingNodeId;
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].selectedClass = classDropdown.value;
+                    saveBuildSets();
+                    refreshBreakpointDropdown();
+                    alert('Breakpoint saved!');
+                });
+
+                // Load breakpoint
+                loadBreakpointBtn.addEventListener('click', () => {
+                    const selectedBp = breakpointDropdown.value;
+                    if (!selectedBp) {
+                        alert('Please select a breakpoint to load.');
+                        return;
+                    }
+                    currentBreakpointId = selectedBp;
+                    const bp = buildSets[currentSetId].breakpoints[selectedBp];
+
+                    // Clear current tree
+                    allocatedNodes.forEach(id => {
+                        const node = svg.querySelector(`#n${id}`);
+                        if (node) node.classList.remove('allocated');
+                    });
+                    allocatedNodes.clear();
+
+                    // Clear connections
+                    const allConnections = svg.querySelectorAll('#connections line, #connections path');
+                    allConnections.forEach(conn => conn.classList.remove('active'));
+
+                    // Set the starting node first
+                    startingNodeId = bp.startingNode;
+
+                    // Load breakpoint nodes
+                    bp.allocatedNodes.forEach(id => {
+                        const node = svg.querySelector(`#n${id}`);
+                        if (node) {
+                            node.classList.add('allocated');
+                            allocatedNodes.add(id);
+                        }
+                    });
+
+                    // Update class dropdown (this should reflect the saved class)
+                    classDropdown.value = bp.selectedClass || '';
+
+                    updateAllConnections();
+                    updatePointsDisplay();
+                });
+
+                // Delete breakpoint
+                deleteBreakpointBtn.addEventListener('click', () => {
+                    const selectedBp = breakpointDropdown.value;
+                    if (!selectedBp) {
+                        alert('Please select a breakpoint to delete.');
+                        return;
+                    }
+                    if (confirm('Are you sure you want to delete this breakpoint?')) {
+                        delete buildSets[currentSetId].breakpoints[selectedBp];
+                        currentBreakpointId = null;
+                        saveBuildSets();
+                        refreshBreakpointDropdown();
+                        breakpointDropdown.value = '';
+                    }
+                });
+
+                // Switch breakpoint
+                breakpointDropdown.addEventListener('change', (e) => {
+                    currentBreakpointId = e.target.value || null;
+                });
+
+                // Initialize
+                refreshBuildSetDropdown();
 
                 updateViewBox();
             })
