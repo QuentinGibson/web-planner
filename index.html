@@ -431,9 +431,19 @@
                         img.setAttribute('width', imgSize);
                         img.setAttribute('height', imgSize);
 
-                        // Convert CDN URL to local PNG path with lowercase filename
-                        const filename = nodeData.icon.split('/').pop().replace('.webp', '').toLowerCase();
-                        img.setAttribute('href', `images/passives/${filename}.png`);
+                        // Convert CDN URL to local PNG path with lowercase filename and subdirectory
+                        const passivesPath = nodeData.icon.match(/passives\/(.+)\.webp/);
+                        const skillIconPath = nodeData.icon.match(/SkillIcons\/([^/]+)\.webp/);
+
+                        if (passivesPath) {
+                            // Icons in passives/ subdirectory
+                            const localPath = passivesPath[1].toLowerCase();
+                            img.setAttribute('href', `images/passives/${localPath}.png`);
+                        } else if (skillIconPath) {
+                            // Icons in SkillIcons/ root directory
+                            const filename = skillIconPath[1].toLowerCase();
+                            img.setAttribute('href', `images/${filename}.png`);
+                        }
                         img.setAttribute('pointer-events', 'none'); // Don't block circle clicks
                         img.classList.add('node-icon');
 
