@@ -254,6 +254,8 @@
                 <option value="">-- Select Class --</option>
                 <option value="50986">Mercenary</option>
                 <option value="54447">Sorceress</option>
+                <option value="54447">Witch</option>
+                <option value="50459">Ranger</option>
                 <option value="50459">Huntress</option>
                 <option value="47175">Warrior</option>
                 <option value="44683">Monk</option>
@@ -443,8 +445,8 @@
                     const baseViewBox = { x: -11326.103852910494, y: -11389.628444746082, width: 23256.18556701031, height: 20315.9793814433 };
                     const width = baseViewBox.width / zoom;
                     const height = baseViewBox.height / zoom;
-                    const x = baseViewBox.x - panX / zoom;
-                    const y = baseViewBox.y - panY / zoom;
+                    const x = baseViewBox.x - panX;
+                    const y = baseViewBox.y - panY;
                     svg.setAttribute('viewBox', `${x} ${y} ${width} ${height}`);
                 }
 
@@ -458,9 +460,16 @@
                     if (isDragging) {
                         const dx = e.clientX - lastX;
                         const dy = e.clientY - lastY;
-                        // Multiply by a factor to make panning faster and more responsive
-                        panX += dx * 50;
-                        panY += dy * 50;
+                        // Multiply by a factor adjusted for zoom to make panning feel consistent
+                        panX += dx * 50 / zoom;
+                        panY += dy * 50 / zoom;
+
+                        // Apply dynamic pan boundaries based on zoom level
+                        // When zoomed in more, allow more panning to reach all areas
+                        const maxPan = 30000;  // Fixed boundaries in SVG coordinates
+                        panX = Math.max(-maxPan, Math.min(maxPan, panX));
+                        panY = Math.max(-maxPan, Math.min(maxPan, panY));
+
                         lastX = e.clientX;
                         lastY = e.clientY;
                         updateViewBox();
@@ -477,8 +486,14 @@
 
                 svg.addEventListener('wheel', (e) => {
                     e.preventDefault();
+
+                    const oldZoom = zoom;
                     const delta = e.deltaY > 0 ? -0.1 : 0.1;  // Faster zoom
-                    zoom = Math.max(0.1, Math.min(5.0, zoom + delta));
+                    zoom = Math.max(0.5, Math.min(5.0, zoom + delta));  // Max zoom out: 0.5, Max zoom in: 5.0
+
+                    // Keep pan stable relative to zoom change
+                    // Don't adjust pan at all - let it stay constant
+
                     updateViewBox();
                 });
 
