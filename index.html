@@ -108,6 +108,29 @@
             stroke-width: 18;
         }
 
+        /* Ascendancy path styling */
+        g[id^="ascendancy-"] line,
+        g[id^="ascendancy-"] path {
+            stroke: #696969;
+            stroke-width: 10;
+            stroke-opacity: 0.5;
+            fill: none;
+        }
+
+        g[id^="ascendancy-"] line.active,
+        g[id^="ascendancy-"] path.active {
+            stroke: #d4af37;
+            stroke-opacity: 0.9;
+            stroke-width: 20;
+        }
+
+        g[id^="ascendancy-"] line.preview,
+        g[id^="ascendancy-"] path.preview {
+            stroke: #4a90e2;
+            stroke-opacity: 0.7;
+            stroke-width: 18;
+        }
+
         /* Phase 1: Skill Points Overlay */
         #points-overlay {
             position: fixed;
@@ -116,129 +139,150 @@
             background: rgba(26, 26, 26, 0.95);
             border: 2px solid #3a3a3a;
             border-radius: 8px;
-            padding: 20px;
+            padding: 12px 16px;
             color: #ccc;
-            min-width: 200px;
+            min-width: 220px;
             z-index: 1000;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        #points-overlay h3 {
-            margin: 0 0 15px 0;
-            color: #d4af37;
-            font-size: 18px;
-            text-align: center;
+        .points-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 14px;
         }
 
-        .points-display {
-            font-size: 28px;
+        .points-label {
             color: #d4af37;
-            text-align: center;
             font-weight: bold;
-            margin: 10px 0;
         }
 
-        #points-used {
+        .points-value {
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        #points-used,
+        #ascendancy-points-used {
             color: #d4af37;
         }
 
-        #points-max {
+        #points-max,
+        #ascendancy-points-max {
             color: #8cf;
         }
 
         /* Class Selection Dropdown */
         .class-selection {
-            margin-top: 15px;
-            padding-top: 15px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 1px solid #3a3a3a;
         }
 
         .class-selection label {
             display: block;
             color: #d4af37;
-            font-size: 14px;
-            margin-bottom: 8px;
+            font-size: 12px;
+            margin-bottom: 6px;
             font-weight: bold;
         }
 
-        #class-dropdown {
+        #class-dropdown,
+        #ascendancy-dropdown {
             width: 100%;
             background: rgba(40, 40, 40, 0.9);
             border: 2px solid #555;
             border-radius: 4px;
-            padding: 8px;
+            padding: 6px 8px;
             color: #d4af37;
-            font-size: 14px;
+            font-size: 12px;
             cursor: pointer;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             transition: border-color 0.3s ease;
         }
 
-        #class-dropdown:hover {
+        #class-dropdown:hover,
+        #ascendancy-dropdown:hover {
             border-color: #d4af37;
         }
 
-        #class-dropdown:focus {
+        #class-dropdown:focus,
+        #ascendancy-dropdown:focus {
             outline: none;
             border-color: #d4af37;
         }
 
-        #class-dropdown option {
+        #class-dropdown option,
+        #ascendancy-dropdown option {
             background: #1a1a1a;
             color: #d4af37;
         }
 
+        #ascendancy-dropdown:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
         /* Build Management */
         .build-management {
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-top: 12px;
+            padding-top: 12px;
             border-top: 1px solid #3a3a3a;
         }
 
         .build-management h4 {
             color: #d4af37;
-            margin-bottom: 15px;
-            font-size: 16px;
+            margin-bottom: 10px;
+            font-size: 13px;
         }
 
         .build-set-selection,
         .breakpoint-selection {
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .build-set-selection label,
         .breakpoint-selection label {
-            display: block;
-            color: #ccc;
-            margin-bottom: 5px;
-            font-size: 12px;
+            display: none;
+        }
+
+        .dropdown-container {
+            display: grid;
+            grid-template-columns: 1fr 21px 21px 21px;
+            gap: 4px;
+            align-items: center;
         }
 
         .build-set-selection select,
         .breakpoint-selection select {
-            width: calc(100% - 110px);
-            padding: 8px;
+            padding: 4px 6px;
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
             color: #d4af37;
-            font-size: 13px;
+            font-size: 11px;
             cursor: pointer;
-            margin-right: 5px;
         }
 
         .build-set-selection button,
         .breakpoint-selection button {
-            width: 30px;
-            height: 30px;
+            width: 21px;
+            height: 21px;
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
-            border-radius: 4px;
+            border-radius: 3px;
             color: #d4af37;
-            font-size: 18px;
+            font-size: 12px;
             cursor: pointer;
             vertical-align: middle;
             margin-right: 2px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
         }
 
         .build-set-selection button:hover,
@@ -250,7 +294,7 @@
         #delete-set-btn,
         #delete-breakpoint-btn-quick {
             color: #ff6b6b;
-            font-size: 24px;
+            font-size: 16px;
             line-height: 1;
         }
 
@@ -261,18 +305,18 @@
 
         .build-actions {
             display: flex;
-            gap: 5px;
-            margin-top: 10px;
+            gap: 4px;
+            margin-top: 8px;
         }
 
         .build-actions button {
             flex: 1;
-            padding: 8px;
+            padding: 6px 8px;
             background: #2a2a2a;
             border: 1px solid #3a3a3a;
             border-radius: 4px;
             color: #d4af37;
-            font-size: 12px;
+            font-size: 11px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
@@ -340,9 +384,14 @@
 
     <!-- Points Counter Overlay -->
     <div id="points-overlay">
-        <h3>Skill Points</h3>
-        <div class="points-display">
-            <span id="points-used">0</span> / <span id="points-max">123</span>
+        <div class="points-row">
+            <span class="points-label">Skill Points:</span>
+            <span class="points-value"><span id="points-used">0</span> / <span id="points-max">123</span></span>
+        </div>
+
+        <div class="points-row">
+            <span class="points-label">Ascendancy:</span>
+            <span class="points-value"><span id="ascendancy-points-used">0</span> / <span id="ascendancy-points-max">8</span></span>
         </div>
 
         <!-- Class Selection Dropdown -->
@@ -360,6 +409,14 @@
             </select>
         </div>
 
+        <!-- Ascendancy Selection -->
+        <div class="class-selection">
+            <label for="ascendancy-dropdown">Ascendancy</label>
+            <select id="ascendancy-dropdown">
+                <option value="">-- Select Class First --</option>
+            </select>
+        </div>
+
         <!-- Build Management -->
         <div class="build-management">
             <h4>Build Management</h4>
@@ -367,30 +424,33 @@
             <!-- Build Set Selection -->
             <div class="build-set-selection">
                 <label for="build-set-dropdown">Build Set</label>
-                <select id="build-set-dropdown">
-                    <option value="">-- New Build Set --</option>
-                </select>
-                <button id="new-set-btn" title="Create New Build Set">+</button>
-                <button id="edit-set-btn" title="Edit Build Set Name">✎</button>
-                <button id="delete-set-btn" title="Delete Build Set">×</button>
+                <div class="dropdown-container">
+                    <select id="build-set-dropdown">
+                        <option value="">-- New Build Set --</option>
+                    </select>
+                    <button id="new-set-btn" title="Create New Build Set">+</button>
+                    <button id="edit-set-btn" title="Edit Build Set Name">✎</button>
+                    <button id="delete-set-btn" title="Delete Build Set">×</button>
+                </div>
             </div>
 
             <!-- Level Breakpoint Selection -->
             <div class="breakpoint-selection">
                 <label for="breakpoint-dropdown">Level Breakpoint</label>
-                <select id="breakpoint-dropdown">
-                    <option value="">-- Select Breakpoint --</option>
-                </select>
-                <button id="add-breakpoint-btn" title="Add Level Breakpoint">+</button>
-                <button id="edit-breakpoint-btn" title="Edit Breakpoint Name">✎</button>
-                <button id="delete-breakpoint-btn-quick" title="Delete Breakpoint">×</button>
+                <div class="dropdown-container">
+                    <select id="breakpoint-dropdown">
+                        <option value="">-- Select Breakpoint --</option>
+                    </select>
+                    <button id="add-breakpoint-btn" title="Add Level Breakpoint">+</button>
+                    <button id="edit-breakpoint-btn" title="Edit Breakpoint Name">✎</button>
+                    <button id="delete-breakpoint-btn-quick" title="Delete Breakpoint">×</button>
+                </div>
             </div>
 
             <!-- Action Buttons -->
             <div class="build-actions">
                 <button id="save-breakpoint-btn">Save Current</button>
                 <button id="load-breakpoint-btn">Load</button>
-                <button id="delete-breakpoint-btn">Delete</button>
             </div>
         </div>
     </div>
@@ -406,10 +466,225 @@
 
                 const svg = document.getElementById('passive_skill_tree');
 
+                // Ascendancy data: node mappings and transforms to center each island
+                const ascendancyData = {
+'Druid1': { nodes: ['378', '4197', '5571', '11335', '15275', '21284', '25092', '30904', '32905', '34313', '37782', '39659', '42761', '47190', '52374', '55135', '56505'], transform: 'translate(20902.97, 2104.17)' },
+'Druid2': { nodes: ['1855', '16204', '26063', '28022', '28745', '33824', '35535', '35762', '35920', '42253', '46654', '54512', '56933', '58646', '61722', '61983', '62523'], transform: 'translate(18777.23, 2154.21)' },
+'Druid3': { nodes: ['2573', '6830', '12816', '13752', '19259', '20041', '28429', '31579', '33582', '35311', '35388', '39614', '39772', '44207', '55382', '59091', '60599'], transform: 'translate(16901.77, 2885.56)' },
+'Duelist1': { nodes: ['7046', '12098', '23826', '25913', '31717', '32222', '38949', '40407', '48546', '57256', '57973', '59474', '61500', '61889', '62386', '62674', '63843'], transform: 'translate(-707.75, -16494.29)' },
+'Duelist2': { nodes: ['3731', '7040', '14460', '15395', '19198', '29718', '30474', '36189', '39210', '39383', '40002', '40226', '52006', '55891', '60122', '60949', '62406'], transform: 'translate(185.29, -18157.20)' },
+'Duelist3': { nodes: ['429', '467', '2375', '3198', '3610', '10889', '16700', '27311', '33436', '35088', '36503', '40548', '42683', '43326', '47676', '48446', '62573'], transform: 'translate(-2366.69, -18279.04)' },
+'Huntress1': { nodes: ['528', '2702', '3065', '5563', '6109', '7979', '9294', '19233', '35033', '35187', '41008', '41736', '42441', '43095', '46071', '47312', '55796', '60662', '63254'], transform: 'translate(-18575.13, -5199.97)' },
+'Huntress2': { nodes: ['765', '4367', '5733', '21519', '26294', '27773', '27841', '28254', '37769', '39887', '41085', '41401', '45228', '46070', '56489', '62424', '62702', '62743', '63493'], transform: 'translate(-18114.96, -6951.15)' },
+'Huntress3': { nodes: ['3223', '4891', '7068', '11776', '17058', '18280', '22661', '30233', '34785', '36365', '37046', '37972', '42017', '58149', '58574', '60859', '62804'], transform: 'translate(-20964.17, -7459.53)' },
+'Marauder1': { nodes: ['8532', '9842', '12004', '12389', '13216', '13434', '14199', '16732', '28460', '28814', '31553', '33810', '34881', '41136', '42816', '62672', '65136'], transform: 'translate(15638.85, -7553.92)' },
+'Marauder2': { nodes: ['4615', '6207', '6799', '12261', '14143', '21343', '21651', '25495', '28539', '31425', '36598', '40246', '40358', '43012', '44561', '54579', '65098'], transform: 'translate(16899.11, -9526.40)' },
+'Marauder3': { nodes: ['11674', '12411', '12826', '18068', '18654', '21773', '23647', '23860', '30817', '31558', '38626', '47642', '47952', '51916', '52088', '61057', '63748'], transform: 'translate(14544.79, -9493.43)' },
+'Mercenary1': { nodes: ['762', '1988', '4086', '4245', '10371', '12054', '15044', '16249', '24696', '29162', '30151', '32560', '32637', '36252', '37523', '42845', '44371', '44746', '46522', '54838', '54892'], transform: 'translate(5755.04, -16850.34)' },
+'Mercenary2': { nodes: ['3704', '6935', '7120', '8272', '17646', '20830', '25172', '32559', '34501', '37078', '38601', '40719', '43131', '46535', '51737', '61897', '61973'], transform: 'translate(7039.73, -19148.85)' },
+'Mercenary3': { nodes: ['1442', '3084', '11641', '14429', '18146', '30996', '32952', '34882', '36728', '36822', '37397', '45248', '53108', '53762', '55536', '55582', '57819', '58591', '60287', '63259'], transform: 'translate(4549.85, -19004.77)' },
+'Monk1': { nodes: ['1739', '11495', '17356', '19370', '20437', '34081', '36643', '37604', '39552', '39595', '41751', '51546', '52295', '53280', '57449', '61586', '65228'], transform: 'translate(-14877.93, 5829.63)' },
+'Monk2': { nodes: ['7621', '8143', '9994', '12876', '13065', '16100', '17268', '23415', '23587', '25434', '27686', '29133', '44357', '52448', '55611', '57181', '63236', '63713', '64031', '65173'], transform: 'translate(-14707.01, 3219.70)' },
+'Monk3': { nodes: ['74', '664', '1347', '3781', '11771', '17923', '18826', '24475', '25779', '25781', '25885', '26283', '31116', '32771', '34817', '36788', '41076', '47344', '50098', '52395', '56331', '59759'], transform: 'translate(-17152.45, 4581.62)' },
+'Ranger1': { nodes: ['30', '3987', '5817', '12033', '23508', '24226', '24295', '29871', '35801', '37336', '39723', '41875', '42416', '46854', '46990', '49165', '59542', '59913', '61461'], transform: 'translate(-14764.13, -4868.33)' },
+'Ranger2': { nodes: ['2373', '5363', '7336', '9529', '11023', '14957', '21719', '24665', '30837', '33201', '34963', '42936', '43835', '47937', '48655', '50878', '55373'], transform: 'translate(-13334.08, -6839.73)' },
+'Ranger3': { nodes: ['16', '40', '1583', '4495', '9710', '9798', '12183', '12795', '13675', '14508', '16433', '18940', '24868', '29074', '33736', '36676', '38004', '39292', '41619', '46454', '49503', '56618', '57141', '57253', '58379', '61804', '61991'], transform: 'translate(-16059.38, -7450)' },
+'Shadow1': { nodes: ['1053', '5162', '10414', '11312', '12799', '19530', '20159', '22050', '25344', '29307', '30998', '33215', '36460', '42596', '43404', '49159', '63282'], transform: 'translate(-13620.01, 10352.87)' },
+'Shadow2': { nodes: ['1226', '1894', '4991', '13317', '15622', '27091', '29322', '30803', '36668', '37563', '38263', '42151', '45406', '52001', '56451', '58418', '60377'], transform: 'translate(-11961.38, 8422.80)' },
+'Shadow3': { nodes: ['2357', '6971', '9707', '12504', '13794', '28353', '30024', '30145', '37921', '38102', '42657', '45769', '48915', '50198', '59432', '62818', '64016'], transform: 'translate(-14416.30, 8512.86)' },
+'Sorceress1': { nodes: ['2857', '7246', '7998', '8867', '12488', '12882', '13673', '18849', '25618', '29398', '38578', '39204', '39640', '40721', '42522', '44484', '49189', '49759', '61985', '64789', '65413'], transform: 'translate(3808.09, 16481.53)' },
+'Sorceress2': { nodes: ['1579', '3605', '10731', '10987', '18678', '22147', '26638', '27990', '28153', '32856', '42035', '43128', '49049', '50219', '54194', '58747', '63002'], transform: 'translate(5769.88, 14953.65)' },
+'Sorceress3': { nodes: ['2810', '8305', '9843', '10561', '13289', '14131', '20701', '23265', '25653', '25683', '25919', '30265', '32705', '34207', '35880', '36096', '36109', '36891', '42034', '43426', '45602', '46091', '54042', '56783', '56857', '64200', '64223', '64591'], transform: 'translate(2746.37, 14654.52)' },
+'Templar1': { nodes: ['2275', '4986', '13663', '15918', '21974', '23443', '23732', '25881', '33239', '35715', '35998', '41311', '44889', '46103', '47526', '63633', '63764'], transform: 'translate(22256.96, 6513.50)' },
+'Templar2': { nodes: ['443', '2187', '9216', '15462', '18096', '20211', '21676', '23641', '26353', '28385', '32191', '45846', '47628', '49398', '51455', '54063', '62882'], transform: 'translate(19756.13, 6783.25)' },
+'Templar3': { nodes: ['950', '7659', '10763', '12040', '21448', '27155', '31686', '38100', '41624', '48905', '48936', '51122', '51742', '55300', '56468', '59905', '65044'], transform: 'translate(17296.97, 6653.86)' },
+'Warrior1': { nodes: ['3762', '12000', '13715', '19424', '24807', '27418', '29323', '30115', '32534', '35453', '38014', '42275', '51690', '56842', '59372', '59540', '60634'], transform: 'translate(17797.64, -3715.46)' },
+'Warrior2': { nodes: ['1994', '6127', '10072', '18585', '23005', '25935', '33812', '36659', '38769', '39365', '39411', '40915', '47097', '48682', '49380', '52068', '58704'], transform: 'translate(20752.06, -4674.49)' },
+'Warrior3': { nodes: ['110', '5386', '5852', '8525', '9988', '9997', '13772', '14960', '16276', '20195', '20895', '22541', '22908', '25438', '47184', '47236', '48537', '49340', '57959', '60298', '60913', '61039', '63401', '64962'], transform: 'translate(21205.86, -7255.40)' },
+'Witch1': { nodes: ['770', '7793', '8854', '10694', '13174', '17754', '18158', '18348', '19482', '23880', '24039', '24135', '25239', '32699', '34419', '36564', '39470', '46016', '46644', '61267', '63484', '63894', '64379'], transform: 'translate(306.38, 17711.22)' },
+'Witch2': { nodes: ['3165', '8415', '23416', '26282', '26383', '27667', '30071', '30117', '31223', '47442', '48551', '50192', '52703', '56162', '59342', '59822', '62388', '65518'], transform: 'translate(-2442.15, 17658.99)' },
+'Witch3': { nodes: ['59', '2516', '2877', '2995', '8611', '17788', '20772', '23352', '23710', '26085', '28431', '33141', '33570', '36696', '39241', '51142', '58751', '58932', '62797'], transform: 'translate(-5240.12, 17902.15)' }
+                };
+
+                // Group ascendancy nodes into SVG groups and center them
+                Object.keys(ascendancyData).forEach(ascName => {
+                    const { nodes: nodeIds, transform } = ascendancyData[ascName];
+
+                    // Create group element
+                    const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                    group.id = `ascendancy-${ascName}`;
+                    group.setAttribute('transform', transform);
+                    group.setAttribute('data-ascendancy', ascName);
+                    group.style.display = 'none'; // Hide by default
+
+                    // First, move all paths and lines connecting ascendancy nodes
+                    const pathsToMove = [];
+                    nodeIds.forEach(nodeId => {
+                        // Find paths/lines with IDs like "c{nodeId}-{otherNodeId}" or "c{otherNodeId}-{nodeId}"
+                        const connectedPaths = svg.querySelectorAll(`path[id^="c${nodeId}-"], line[id^="c${nodeId}-"], path[id*="-${nodeId}"], line[id*="-${nodeId}"]`);
+                        connectedPaths.forEach(path => {
+                            // Only move if both nodes are in this ascendancy
+                            const pathId = path.id;
+                            const match = pathId.match(/c(\d+)-(\d+)/);
+                            if (match) {
+                                const [, node1, node2] = match;
+                                if (nodeIds.includes(node1) && nodeIds.includes(node2)) {
+                                    if (!pathsToMove.includes(path)) {
+                                        pathsToMove.push(path);
+                                    }
+                                }
+                            }
+                        });
+                    });
+
+                    // Move paths first
+                    pathsToMove.forEach(path => {
+                        group.appendChild(path);
+                    });
+
+                    // Then move all circles
+                    nodeIds.forEach(nodeId => {
+                        const circle = svg.querySelector(`#n${nodeId}`);
+                        if (circle) {
+                            group.appendChild(circle);
+                        }
+                    });
+
+                    // Add group to SVG
+                    svg.appendChild(group);
+                });
+
+                // Ascendancy selection mapping
+                const classAscendancies = {
+                    'Warrior': ['Warrior1', 'Warrior2', 'Warrior3'],
+                    'Witch': ['Witch1', 'Witch2', 'Witch3'],
+                    'Ranger': ['Ranger1', 'Ranger2', 'Ranger3'],
+                    'Huntress': ['Huntress1', 'Huntress2', 'Huntress3'],
+                    'Mercenary': ['Mercenary1', 'Mercenary2', 'Mercenary3'],
+                    'Sorceress': ['Sorceress1', 'Sorceress2', 'Sorceress3'],
+                    'Monk': ['Monk1', 'Monk2', 'Monk3']
+                };
+
+                const ascendancyNames = {
+                    'Warrior1': 'Titan',
+                    'Warrior2': 'Warbringer',
+                    'Warrior3': 'Smith of Kitava',
+                    'Witch1': 'Infernalist',
+                    'Witch2': 'Blood Mage',
+                    'Witch3': 'Necromancer',
+                    'Ranger1': 'Deadeye',
+                    'Ranger2': 'Arcane Archer',
+                    'Ranger3': 'Pathfinder',
+                    'Huntress1': 'Amazon',
+                    'Huntress2': 'Beastmaster',
+                    'Huntress3': 'Ritualist',
+                    'Mercenary1': 'Tactician',
+                    'Mercenary2': 'Witchhunter',
+                    'Mercenary3': 'Gemling Legionnaire',
+                    'Sorceress1': 'Stormweaver',
+                    'Sorceress2': 'Chronomancer',
+                    'Sorceress3': 'Disciple of the Djinn',
+                    'Monk1': 'Martial Artist',
+                    'Monk2': 'Invoker',
+                    'Monk3': 'Acolyte of Chayula'
+                };
+
+                // Starting node for each ascendancy (entry point from main tree)
+                const ascendancyStartNodes = {
+                    'Warrior1': '32534',
+                    'Warrior2': '33812',
+                    'Warrior3': '5852',
+                    'Witch1': '32699',
+                    'Witch2': '59822',
+                    'Witch3': '23710',
+                    'Ranger1': '46990',
+                    'Ranger2': '24665',
+                    'Ranger3': '1583',
+                    'Huntress1': '41736',
+                    'Huntress2': '63493',
+                    'Huntress3': '36365',
+                    'Mercenary1': '36252',
+                    'Mercenary2': '7120',
+                    'Mercenary3': '55536',
+                    'Sorceress1': '40721',
+                    'Sorceress2': '22147',
+                    'Sorceress3': '8305',
+                    'Monk1': '11495',
+                    'Monk2': '9994',
+                    'Monk3': '74',
+                    'Duelist1': '62386',
+                    'Duelist2': '39383',
+                    'Duelist3': '10889',
+                    'Marauder1': '16732',
+                    'Marauder2': '54579',
+                    'Marauder3': '51916',
+                    'Shadow1': '5162',
+                    'Shadow2': '45406',
+                    'Shadow3': '50198',
+                    'Templar1': '35715',
+                    'Templar2': '26353',
+                    'Templar3': '950',
+                    'Druid1': '378',
+                    'Druid2': '62523',
+                    'Druid3': '2573'
+                };
+
+                const ascendancyDropdown = document.getElementById('ascendancy-dropdown');
+                let currentSelectedAscendancy = null;
+
+                // Show selected ascendancy
+                ascendancyDropdown.addEventListener('change', (e) => {
+                    const selectedAscendancy = e.target.value;
+
+                    // Clear all ascendancy allocated nodes when changing ascendancy
+                    allocatedAscendancyNodes.forEach(nodeId => {
+                        const node = svg.querySelector(`#n${nodeId}`);
+                        if (node) {
+                            node.classList.remove('allocated');
+                        }
+                    });
+                    allocatedAscendancyNodes.clear();
+                    ascendancyStartingNodeId = null;
+
+                    // Hide all ascendancies
+                    Object.keys(ascendancyData).forEach(ascName => {
+                        const group = svg.querySelector(`#ascendancy-${ascName}`);
+                        if (group) group.style.display = 'none';
+                    });
+
+                    // Show selected ascendancy
+                    if (selectedAscendancy) {
+                        const group = svg.querySelector(`#ascendancy-${selectedAscendancy}`);
+                        if (group) {
+                            group.style.display = 'block';
+                            currentSelectedAscendancy = selectedAscendancy;
+                        }
+
+                        // Auto-allocate the starting node
+                        const startNodeId = ascendancyStartNodes[selectedAscendancy];
+                        if (startNodeId) {
+                            const startNode = svg.querySelector(`#n${startNodeId}`);
+                            if (startNode) {
+                                startNode.classList.add('allocated');
+                                allocatedAscendancyNodes.add(startNodeId);
+                                ascendancyStartingNodeId = startNodeId;
+                            }
+                        }
+                    } else {
+                        currentSelectedAscendancy = null;
+                    }
+
+                    updatePointsDisplay();
+                    updateAllConnections();
+                });
+
                 // Phase 1: Track allocated nodes
                 let allocatedNodes = new Set();
+                let allocatedAscendancyNodes = new Set();
                 let startingNodeId = null; // Track the class starting node
+                let ascendancyStartingNodeId = null; // Track the first ascendancy node
                 const maxPoints = 123;
+                const maxAscendancyPoints = 8;
 
                 // Apply node images from tree data
                 const nodes = treeData.nodes;
@@ -454,7 +729,8 @@
 
                 // Build connection graph once for performance
                 const connectionGraph = new Map();
-                const allConnections = svg.querySelectorAll('#connections line, #connections path');
+                // Include both main tree connections and ascendancy connections
+                const allConnections = svg.querySelectorAll('#connections line, #connections path, g[id^="ascendancy-"] line, g[id^="ascendancy-"] path');
                 allConnections.forEach(conn => {
                     const connId = conn.id;
                     if (connId.startsWith('c')) {
@@ -567,6 +843,84 @@
                     return disconnected;
                 }
 
+                // Ascendancy pathfinding (similar to main tree but uses ascendancy nodes)
+                function findShortestPathAscendancy(targetNodeId) {
+                    if (allocatedAscendancyNodes.size === 0) {
+                        return null;
+                    }
+
+                    // BFS to find shortest path within ascendancy
+                    const queue = [];
+                    const visited = new Set();
+                    const parent = new Map();
+
+                    queue.push(targetNodeId);
+                    visited.add(targetNodeId);
+
+                    while (queue.length > 0) {
+                        const currentId = queue.shift();
+
+                        if (allocatedAscendancyNodes.has(currentId)) {
+                            const path = [];
+                            let node = currentId;
+                            while (parent.has(node)) {
+                                node = parent.get(node);
+                                if (!allocatedAscendancyNodes.has(node)) {
+                                    path.push(node);
+                                }
+                            }
+                            return path;
+                        }
+
+                        const neighbors = connectionGraph.get(currentId) || [];
+                        neighbors.forEach(neighborId => {
+                            // Only consider neighbors within the same ascendancy
+                            if (!visited.has(neighborId) && isAscendancyNode(neighborId)) {
+                                visited.add(neighborId);
+                                parent.set(neighborId, currentId);
+                                queue.push(neighborId);
+                            }
+                        });
+                    }
+
+                    return null;
+                }
+
+                function findDisconnectedNodesAscendancy(removedNodeId) {
+                    const disconnected = [];
+
+                    allocatedAscendancyNodes.forEach(nodeId => {
+                        if (nodeId === ascendancyStartingNodeId || nodeId === removedNodeId) return;
+
+                        const queue = [nodeId];
+                        const visited = new Set([nodeId, removedNodeId]);
+                        let foundStart = false;
+
+                        while (queue.length > 0) {
+                            const currentId = queue.shift();
+
+                            if (currentId === ascendancyStartingNodeId) {
+                                foundStart = true;
+                                break;
+                            }
+
+                            const neighbors = connectionGraph.get(currentId) || [];
+                            neighbors.forEach(neighborId => {
+                                if (!visited.has(neighborId) && allocatedAscendancyNodes.has(neighborId) && isAscendancyNode(neighborId)) {
+                                    visited.add(neighborId);
+                                    queue.push(neighborId);
+                                }
+                            });
+                        }
+
+                        if (!foundStart) {
+                            disconnected.push(nodeId);
+                        }
+                    });
+
+                    return disconnected;
+                }
+
                 // Add zoom and pan
                 let zoom = 1.0;  // Start at 1x zoom (normal size)
                 let panX = 0;
@@ -575,11 +929,22 @@
                 let lastX = 0;
                 let lastY = 0;
 
+                // Helper function to check if a node is in an ascendancy tree
+                function isAscendancyNode(nodeId) {
+                    if (!currentSelectedAscendancy) return false;
+                    const ascData = ascendancyData[currentSelectedAscendancy];
+                    return ascData && ascData.nodes.includes(nodeId);
+                }
+
                 // Phase 1: Update points display
                 function updatePointsDisplay() {
                     // Don't count the starting node
                     const pointsUsed = startingNodeId ? allocatedNodes.size - 1 : 0;
                     document.getElementById('points-used').textContent = pointsUsed;
+
+                    // Ascendancy points - don't count the first ascendancy node
+                    const ascendancyPointsUsed = ascendancyStartingNodeId ? allocatedAscendancyNodes.size - 1 : 0;
+                    document.getElementById('ascendancy-points-used').textContent = ascendancyPointsUsed;
                 }
 
                 function updateViewBox() {
@@ -641,8 +1006,25 @@
 
                 // Update all connection visuals
                 function updateAllConnections() {
-                    const allConnections = svg.querySelectorAll('#connections line, #connections path');
-                    allConnections.forEach(conn => {
+                    // Update main tree connections
+                    const mainConnections = svg.querySelectorAll('#connections line, #connections path');
+                    mainConnections.forEach(conn => {
+                        const connId = conn.id;
+                        const parts = connId.replace('c', '').split('-');
+                        if (parts.length === 2) {
+                            const n1 = svg.querySelector(`#n${parts[0]}`);
+                            const n2 = svg.querySelector(`#n${parts[1]}`);
+                            if (n1 && n2 && n1.classList.contains('allocated') && n2.classList.contains('allocated')) {
+                                conn.classList.add('active');
+                            } else {
+                                conn.classList.remove('active');
+                            }
+                        }
+                    });
+
+                    // Update ascendancy connections
+                    const ascendancyConnections = svg.querySelectorAll('g[id^="ascendancy-"] line, g[id^="ascendancy-"] path');
+                    ascendancyConnections.forEach(conn => {
                         const connId = conn.id;
                         const parts = connId.replace('c', '').split('-');
                         if (parts.length === 2) {
@@ -748,43 +1130,82 @@
                 svg.addEventListener('click', (e) => {
                     if (e.target.tagName === 'circle') {
                         const nodeId = e.target.id.replace('n', '');
+                        const isAscNode = isAscendancyNode(nodeId);
 
                         if (e.target.classList.contains('allocated')) {
-                            // Can't remove the starting node
-                            if (nodeId === startingNodeId) return;
+                            // Can't remove the starting nodes
+                            if (nodeId === startingNodeId || nodeId === ascendancyStartingNodeId) return;
 
-                            // Find nodes that will be disconnected
-                            const disconnected = findDisconnectedNodes(nodeId);
+                            if (isAscNode) {
+                                // Ascendancy node deallocation
+                                const disconnected = findDisconnectedNodesAscendancy(nodeId);
 
-                            // Deallocate the clicked node
-                            e.target.classList.remove('allocated');
-                            allocatedNodes.delete(nodeId);
+                                e.target.classList.remove('allocated');
+                                allocatedAscendancyNodes.delete(nodeId);
 
-                            // Deallocate all disconnected nodes
-                            disconnected.forEach(discNodeId => {
-                                const discNode = svg.querySelector(`#n${discNodeId}`);
-                                if (discNode) {
-                                    discNode.classList.remove('allocated');
-                                    allocatedNodes.delete(discNodeId);
-                                }
-                            });
-                        } else {
-                            // Try to allocate with path finding
-                            const path = findShortestPath(nodeId);
-
-                            if (path !== null) {
-                                // Allocate the target node
-                                e.target.classList.add('allocated');
-                                allocatedNodes.add(nodeId);
-
-                                // Allocate all nodes in the path
-                                path.forEach(pathNodeId => {
-                                    const pathNode = svg.querySelector(`#n${pathNodeId}`);
-                                    if (pathNode && !allocatedNodes.has(pathNodeId)) {
-                                        pathNode.classList.add('allocated');
-                                        allocatedNodes.add(pathNodeId);
+                                disconnected.forEach(discNodeId => {
+                                    const discNode = svg.querySelector(`#n${discNodeId}`);
+                                    if (discNode) {
+                                        discNode.classList.remove('allocated');
+                                        allocatedAscendancyNodes.delete(discNodeId);
                                     }
                                 });
+                            } else {
+                                // Main tree deallocation
+                                const disconnected = findDisconnectedNodes(nodeId);
+
+                                e.target.classList.remove('allocated');
+                                allocatedNodes.delete(nodeId);
+
+                                disconnected.forEach(discNodeId => {
+                                    const discNode = svg.querySelector(`#n${discNodeId}`);
+                                    if (discNode) {
+                                        discNode.classList.remove('allocated');
+                                        allocatedNodes.delete(discNodeId);
+                                    }
+                                });
+                            }
+                        } else {
+                            if (isAscNode) {
+                                // Ascendancy node allocation
+                                if (!ascendancyStartingNodeId) {
+                                    // No ascendancy selected
+                                    return;
+                                }
+
+                                // Check point limit (excluding starting node)
+                                if (allocatedAscendancyNodes.size - 1 >= maxAscendancyPoints) return;
+
+                                const path = findShortestPathAscendancy(nodeId);
+
+                                if (path !== null) {
+                                    e.target.classList.add('allocated');
+                                    allocatedAscendancyNodes.add(nodeId);
+
+                                    path.forEach(pathNodeId => {
+                                        const pathNode = svg.querySelector(`#n${pathNodeId}`);
+                                        if (pathNode && !allocatedAscendancyNodes.has(pathNodeId)) {
+                                            pathNode.classList.add('allocated');
+                                            allocatedAscendancyNodes.add(pathNodeId);
+                                        }
+                                    });
+                                }
+                            } else {
+                                // Main tree allocation
+                                const path = findShortestPath(nodeId);
+
+                                if (path !== null) {
+                                    e.target.classList.add('allocated');
+                                    allocatedNodes.add(nodeId);
+
+                                    path.forEach(pathNodeId => {
+                                        const pathNode = svg.querySelector(`#n${pathNodeId}`);
+                                        if (pathNode && !allocatedNodes.has(pathNodeId)) {
+                                            pathNode.classList.add('allocated');
+                                            allocatedNodes.add(pathNodeId);
+                                        }
+                                    });
+                                }
                             }
                         }
 
@@ -845,6 +1266,32 @@
 
                 classDropdown.addEventListener('change', (e) => {
                     const nodeId = e.target.value;
+                    const selectedOption = e.target.selectedOptions[0];
+                    const className = selectedOption ? selectedOption.textContent : '';
+
+                    // Update ascendancy dropdown
+                    currentSelectedAscendancy = null;
+
+                    // Hide all ascendancies
+                    Object.keys(ascendancyData).forEach(ascName => {
+                        const group = svg.querySelector(`#ascendancy-${ascName}`);
+                        if (group) group.style.display = 'none';
+                    });
+
+                    // Populate ascendancy dropdown
+                    ascendancyDropdown.innerHTML = '<option value="">-- Select Ascendancy --</option>';
+
+                    if (classAscendancies[className]) {
+                        classAscendancies[className].forEach(ascKey => {
+                            const option = document.createElement('option');
+                            option.value = ascKey;
+                            option.textContent = ascendancyNames[ascKey] || ascKey;
+                            ascendancyDropdown.appendChild(option);
+                        });
+                        ascendancyDropdown.disabled = false;
+                    } else {
+                        ascendancyDropdown.disabled = true;
+                    }
 
                     if (!nodeId) return; // No class selected
 
@@ -886,7 +1333,6 @@
                 const deleteBreakpointBtnQuick = document.getElementById('delete-breakpoint-btn-quick');
                 const saveBreakpointBtn = document.getElementById('save-breakpoint-btn');
                 const loadBreakpointBtn = document.getElementById('load-breakpoint-btn');
-                const deleteBreakpointBtn = document.getElementById('delete-breakpoint-btn');
 
                 // Load build sets into dropdown
                 function refreshBuildSetDropdown() {
@@ -1044,10 +1490,19 @@
                         return;
                     }
                     const pointsUsed = startingNodeId ? allocatedNodes.size - 1 : 0;
+                    const ascendancyPointsUsed = ascendancyStartingNodeId ? allocatedAscendancyNodes.size - 1 : 0;
+
                     buildSets[currentSetId].breakpoints[currentBreakpointId].allocatedNodes = Array.from(allocatedNodes);
                     buildSets[currentSetId].breakpoints[currentBreakpointId].points = pointsUsed;
                     buildSets[currentSetId].breakpoints[currentBreakpointId].startingNode = startingNodeId;
                     buildSets[currentSetId].breakpoints[currentBreakpointId].selectedClass = classDropdown.value;
+
+                    // Save ascendancy data
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].selectedAscendancy = currentSelectedAscendancy;
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].allocatedAscendancyNodes = Array.from(allocatedAscendancyNodes);
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].ascendancyPoints = ascendancyPointsUsed;
+                    buildSets[currentSetId].breakpoints[currentBreakpointId].ascendancyStartingNode = ascendancyStartingNodeId;
+
                     saveBuildSets();
                     refreshBreakpointDropdown();
                     alert('Breakpoint saved!');
@@ -1063,21 +1518,88 @@
                     currentBreakpointId = selectedBp;
                     const bp = buildSets[currentSetId].breakpoints[selectedBp];
 
-                    // Clear current tree
+                    // Clear current main tree
                     allocatedNodes.forEach(id => {
                         const node = svg.querySelector(`#n${id}`);
                         if (node) node.classList.remove('allocated');
                     });
                     allocatedNodes.clear();
 
+                    // Clear current ascendancy tree
+                    allocatedAscendancyNodes.forEach(id => {
+                        const node = svg.querySelector(`#n${id}`);
+                        if (node) node.classList.remove('allocated');
+                    });
+                    allocatedAscendancyNodes.clear();
+
                     // Clear connections
-                    const allConnections = svg.querySelectorAll('#connections line, #connections path');
-                    allConnections.forEach(conn => conn.classList.remove('active'));
+                    const allMainConnections = svg.querySelectorAll('#connections line, #connections path');
+                    allMainConnections.forEach(conn => conn.classList.remove('active'));
+                    const allAscConnections = svg.querySelectorAll('g[id^="ascendancy-"] line, g[id^="ascendancy-"] path');
+                    allAscConnections.forEach(conn => conn.classList.remove('active'));
 
                     // Set the starting node first
                     startingNodeId = bp.startingNode;
 
-                    // Load breakpoint nodes
+                    // Update class dropdown (this should reflect the saved class)
+                    classDropdown.value = bp.selectedClass || '';
+
+                    // Manually populate ascendancy dropdown based on class
+                    const selectedOption = classDropdown.selectedOptions[0];
+                    const className = selectedOption ? selectedOption.textContent : '';
+
+                    ascendancyDropdown.innerHTML = '<option value="">-- Select Ascendancy --</option>';
+                    if (classAscendancies[className]) {
+                        classAscendancies[className].forEach(ascKey => {
+                            const option = document.createElement('option');
+                            option.value = ascKey;
+                            option.textContent = ascendancyNames[ascKey] || ascKey;
+                            ascendancyDropdown.appendChild(option);
+                        });
+                        ascendancyDropdown.disabled = false;
+                    } else {
+                        ascendancyDropdown.disabled = true;
+                    }
+
+                    // Load ascendancy selection and show it
+                    if (bp.selectedAscendancy) {
+                        ascendancyDropdown.value = bp.selectedAscendancy;
+                        currentSelectedAscendancy = bp.selectedAscendancy;
+
+                        // Show the selected ascendancy
+                        Object.keys(ascendancyData).forEach(ascName => {
+                            const group = svg.querySelector(`#ascendancy-${ascName}`);
+                            if (group) group.style.display = 'none';
+                        });
+
+                        const group = svg.querySelector(`#ascendancy-${bp.selectedAscendancy}`);
+                        if (group) {
+                            group.style.display = 'block';
+                        }
+
+                        // Load ascendancy nodes
+                        if (bp.allocatedAscendancyNodes) {
+                            bp.allocatedAscendancyNodes.forEach(id => {
+                                const node = svg.querySelector(`#n${id}`);
+                                if (node) {
+                                    node.classList.add('allocated');
+                                    allocatedAscendancyNodes.add(id);
+                                }
+                            });
+                        }
+                        if (bp.ascendancyStartingNode) {
+                            ascendancyStartingNodeId = bp.ascendancyStartingNode;
+                        }
+                    } else {
+                        // Hide all ascendancies
+                        Object.keys(ascendancyData).forEach(ascName => {
+                            const group = svg.querySelector(`#ascendancy-${ascName}`);
+                            if (group) group.style.display = 'none';
+                        });
+                        currentSelectedAscendancy = null;
+                    }
+
+                    // Load breakpoint nodes AFTER setting up ascendancy
                     bp.allocatedNodes.forEach(id => {
                         const node = svg.querySelector(`#n${id}`);
                         if (node) {
@@ -1086,27 +1608,8 @@
                         }
                     });
 
-                    // Update class dropdown (this should reflect the saved class)
-                    classDropdown.value = bp.selectedClass || '';
-
                     updateAllConnections();
                     updatePointsDisplay();
-                });
-
-                // Delete breakpoint
-                deleteBreakpointBtn.addEventListener('click', () => {
-                    const selectedBp = breakpointDropdown.value;
-                    if (!selectedBp) {
-                        alert('Please select a breakpoint to delete.');
-                        return;
-                    }
-                    if (confirm('Are you sure you want to delete this breakpoint?')) {
-                        delete buildSets[currentSetId].breakpoints[selectedBp];
-                        currentBreakpointId = null;
-                        saveBuildSets();
-                        refreshBreakpointDropdown();
-                        breakpointDropdown.value = '';
-                    }
                 });
 
                 // Switch breakpoint
@@ -1116,6 +1619,11 @@
 
                 // Initialize
                 refreshBuildSetDropdown();
+
+                // Reset dropdowns to default state on page load
+                classDropdown.value = '';
+                ascendancyDropdown.value = '';
+                ascendancyDropdown.disabled = true;
 
                 updateViewBox();
             })
